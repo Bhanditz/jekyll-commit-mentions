@@ -7,7 +7,7 @@ module Jekyll
     safe true
 
     def initialize(config = Hash.new)
-      @base_url = base_url(config['jekyll-issue-mentions'])
+      @base_url = base_url(config['jekyll-commit-mentions'])
     end
 
     def generate(site)

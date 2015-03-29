@@ -21,7 +21,7 @@ module CommitMentionsTestHelpers
           "collections" => {
             "docs"  => {}
           },
-          "jekyll-issue-mentions" => {
+          "jekyll-commit-mentions" => {
             "base_url" => "https://github.com/usr1/repo1/commit"
           }
         }
