@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = "jekyll-commit-mentions"
   s.summary     = "Github commit sha mention support for your jekyll site"
-  s.version     = "0.1.2"
+  s.version     = "0.1.3"
   s.authors     = ["harish shetty"]
   s.email       = "support@workato.com"
 
