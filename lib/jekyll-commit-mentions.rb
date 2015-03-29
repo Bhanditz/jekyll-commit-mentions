@@ -5,9 +5,10 @@ require 'commit_mention_filter'
 module Jekyll
   class CommitMentions < Jekyll::Generator
     safe true
+    attr_reader :base_url
 
     def initialize(config = Hash.new)
-      @base_url = base_url(config['jekyll-commit-mentions'])
+      validate_config!(config)
     end
 
     def generate(site)
@@ -17,7 +18,7 @@ module Jekyll
     end
 
     def mentionify(page)
-      @filter = HTML::Pipeline::CommitMentionFilter.new(page.content, {:base_url => @base_url})
+      @filter = HTML::Pipeline::CommitMentionFilter.new(page.content, {:base_url => base_url})
       page.content = @filter.call.to_s
     end
 
@@ -25,22 +26,21 @@ module Jekyll
       page.html? || page.url.end_with?('/')
     end
 
-    def base_url(configs)
+  private
+    def validate_config!(configs)
+      configs = configs['jekyll-commit-mentions']
+      base_url = nil
       case configs
-      when nil, NilClass
-        raise ArgumentError.new("Your jekyll-issue-mentions config has to configured.")
       when String
-        configs.to_s
+        base_url = configs
       when Hash
         base_url = configs['base_url']
-        if base_url.nil?
-          raise ArgumentError.new("Your jekyll-issue-mentions is missing base_url configuration.")
-        else
-          base_url
-        end
-      else
-        raise ArgumentError.new("Your jekyll-issue-mentions config has to either be a string or a hash! It's a #{configs.class} right now.")
       end
+      error_prefix = "jekyll-commit-mentions"
+      raise ArgumentError.new("#{error_prefix}.base_url is missing/empty") if (base_url.nil? || base_url.empty?)
+
+      @base_url = base_url
     end
+
   end
 end

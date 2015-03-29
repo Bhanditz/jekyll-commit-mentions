@@ -2,16 +2,16 @@ require 'set'
 
 module HTML
   class Pipeline
-    # HTML filter that replaces #mention mentions with links to Github issue. Mentions within <pre>,
+    # HTML filter that replaces mention mentions with links to Github commit. Mentions within <pre>,
     # <code>, <style> and <a> elements are ignored.
     #
     # Context options:
-    #   :base_url - Used to construct links to issue page for each mention.
+    #   :base_url - Used to construct links to commit page for each mention.
     #   :commitid_pattern - Used to provide a custom regular expression to
-    #                       identify issue ids
+    #                       identify commit ids
     #
     class CommitMentionFilter < Filter
-      # Public: Find issue #mention in text.  See
+      # Public: Find commit mention in text.  See
       # CommitMentionFilter#mention_link_filter.
       #
       #   CommitMentionFilter.mentioned_commits_in(text) do |match, commitid|
@@ -72,24 +72,24 @@ module HTML
         context[:commitid_pattern] || CommitidPattern
       end
 
-      # Replace issue #mentions in text with links to the mentioned
-      # issue's page.
+      # Replace commit mentions in text with links to the mentioned
+      # commit's page.
       #
-      # text      - String text to replace #mention commitids in.
-      # base_url  - The base URL used to construct issue page URLs.
+      # text      - String text to replace mention commitids in.
+      # base_url  - The base URL used to construct commit page URLs.
       # commitid_pattern  - Regular expression used to identify commitid in
       #                     text
       #
       # Returns a string with #commitid replaced with links. All links have a
-      # 'issue-mention' class name attached for styling.
+      # 'commit-mention' class name attached for styling.
       def mention_link_filter(text, base_url='/', commitid_pattern)
         self.class.mentioned_commits_in(text, commitid_pattern) do |match, commitid|
-          link = link_to_mentioned_issue(commitid)
+          link = link_to_mentioned_commit(commitid)
           link ? match.sub("#{commitid}", link) : match
         end
       end
 
-      def link_to_mentioned_issue(commitid)
+      def link_to_mentioned_commit(commitid)
         result[:mentioned_commitids] |= [commitid]
 
         url = base_url.dup

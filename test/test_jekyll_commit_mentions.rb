@@ -30,6 +30,10 @@ class TestJekyllCommitMentions < Minitest::Test
       gsub("%7D", "}")
   end
 
+  def base_url(configs)
+    Jekyll::CommitMentions.new("jekyll-commit-mentions" => configs).base_url
+  end
+
   should "replace mention with link" do
     page = page_with_name(@site, "index.md")
 
@@ -83,27 +87,23 @@ class TestJekyllCommitMentions < Minitest::Test
   end
 
 
-  context "reading custom base urls" do
-    def setup
-      @mentions = Jekyll::CommitMentions.new(Hash.new)
+  context "config" do
+    context "bad config" do
+      should "should raise exception for invalid values" do
+        assert_raises(ArgumentError) { base_url(nil) }
+        assert_raises(ArgumentError) { base_url({})  }
+        assert_raises(ArgumentError) { base_url(123) }
+      end
     end
 
-    should "handle a raw string" do
-      assert_equal "https://twitter.com", @mentions.base_url("https://twitter.com")
-    end
+    context "base_url" do
+      should "handle a raw string" do
+        assert_equal "https://twitter.com", base_url("https://twitter.com")
+      end
 
-    should "handle a hash config" do
-      assert_equal "https://twitter.com", @mentions.base_url({"base_url" => "https://twitter.com"})
-    end
-
-    should "should raise exception when not configured" do
-      assert_raises(ArgumentError) { @mentions.base_url(nil) }
-      assert_raises(ArgumentError) { @mentions.base_url({}) }
-    end
-
-    should "should raise exception when invalid value is passed" do
-      assert_raises(ArgumentError) { @mentions.base_url(12) }
+      should "handle a hash config" do
+        assert_equal "https://twitter.com", base_url({"base_url" => "https://twitter.com"})
+      end
     end
   end
-
 end
