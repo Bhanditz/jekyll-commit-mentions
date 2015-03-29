@@ -5,7 +5,6 @@ require 'shoulda'
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'jekyll-commit-mentions'
-require 'byebug'
 
 TEST_DIR     = File.expand_path("../", __FILE__)
 FIXTURES_DIR = File.expand_path("fixtures", TEST_DIR)
