@@ -3,26 +3,41 @@ require 'helper'
 class TestJekyllCommitMentions < Minitest::Test
   include CommitMentionsTestHelpers
 
+  def commitid
+    "665d43f96ef1018e66d294ccc433fefadd236090"
+  end
+
+  def short_commitid
+    commitid[-7..-1]
+  end
+
   def setup
     @site = fixture_site
     @site.read
     @site.config['jekyll-commit-mentions'] = {"base_url" => "https://github.com/usr1/repo1/commit"}
-    @mentions = Jekyll::IssueMentions.new(@site.config)
-    @mention = "1234 <a href='https://github.com/usr1/repo1/commit/aa4892d89' class='commit-mention'>4892d89</a> 1234"
+    @mentions = Jekyll::CommitMentions.new(@site.config)
+    @mention = "1234 <a href='https://github.com/usr1/repo1/commit/#{commitid}' class='commit-mention'>#{short_commitid}</a> 1234"
   end
 
   def content page
-    page.content.gsub(/\n\z/, '')
+    # counter UTF-8 encoding https://groups.google.com/forum/#!msg/nokogiri-talk/Q2Nh1cLeQzk/dNyAwQ3vgQsJ
+    page.content.
+      gsub(/\n\z/, '').
+      gsub('"', "'").
+      gsub("&gt;", ">").
+      gsub("%7B", "{").
+      gsub("%20", " ").
+      gsub("%7D", "}")
   end
 
-  should "replace #mention with link" do
+  should "replace mention with link" do
     page = page_with_name(@site, "index.md")
 
     @mentions.mentionify page
     assert_equal @mention, content(page)
   end
 
-  should "replace @mention with link in collections" do
+  should "replace mention with link in collections" do
     page = document("file.md")
 
     @mentions.mentionify page
@@ -38,7 +53,7 @@ class TestJekyllCommitMentions < Minitest::Test
     page = page_with_name(@site, "leave-liquid-alone.md")
 
     @mentions.mentionify page
-    assert_equal "#{@mention}<a href=\"{{ foo }}\">1234</a>", content(page)
+    assert_equal "#{@mention}<a href='{{ foo }}'>1234</a>", content(page)
   end
 
   should "not mangle markdown" do
@@ -57,20 +72,20 @@ class TestJekyllCommitMentions < Minitest::Test
 
   should "not touch non-HTML pages" do
     @mentions.generate(@site)
-    assert_equal "aa4892d89 1234 1234", content(page_with_name(@site, "test.json"))
+    assert_equal "#{commitid} 1234 1234", content(page_with_name(@site, "test.json"))
   end
 
   should "also convert pages with permalinks ending in /" do
     page = page_with_name(@site, "parkr.txt")
 
     @mentions.mentionify page
-    assert_equal "Parker <a href='https://github.com/usr1/repo1/commit/aa4892d89' class='commit-mention'>4892d89</a> Moore", content(page)
+    assert_equal "Parker <a href='https://github.com/usr1/repo1/commit/#{commitid}' class='commit-mention'>#{short_commitid}</a> Moore", content(page)
   end
 
 
   context "reading custom base urls" do
     def setup
-      @mentions = Jekyll::IssueMentions.new(Hash.new)
+      @mentions = Jekyll::CommitMentions.new(Hash.new)
     end
 
     should "handle a raw string" do

@@ -27,6 +27,10 @@ Refer to this commit a5c3785ed8d6a35868bc169f07e40e889087fd2e for more
 details
 ```
 
+This will be rendered as
+
+> Refer to this commit [087fd2e](https://github.com/workato/jekyll-commit-mentions/commit/a5c3785ed8d6a35868bc169f07e40e889087fd2e) for more details
+
 ## Configuration
 
 Set the Github repo url:

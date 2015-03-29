@@ -3,11 +3,11 @@ require 'html/pipeline'
 require 'commit_mention_filter'
 
 module Jekyll
-  class IssueMentions < Jekyll::Generator
+  class CommitMentions < Jekyll::Generator
     safe true
 
     def initialize(config = Hash.new)
-      @filter = HTML::Pipeline::CommitMentionFilter.new(nil, {:base_url => base_url(config['jekyll-issue-mentions']) })
+      @base_url = base_url(config['jekyll-issue-mentions'])
     end
 
     def generate(site)
@@ -17,8 +17,8 @@ module Jekyll
     end
 
     def mentionify(page)
-      return if !page.content.match(@filter.commitid_pattern)
-      page.content = @filter.mention_link_filter(page.content, @filter.base_url, @filter.commitid_pattern)
+      @filter = HTML::Pipeline::CommitMentionFilter.new(page.content, {:base_url => @base_url})
+      page.content = @filter.call.to_s
     end
 
     def html_page?(page)

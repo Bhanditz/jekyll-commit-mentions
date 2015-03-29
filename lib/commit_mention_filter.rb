@@ -49,17 +49,17 @@ module HTML
 
       # Default pattern used to extract commitid from text. The value can be
       # overriden by providing the commitid_pattern variable in the context.
-      CommitidPattern = /[0-9a-f]{7,40}/
+      CommitidPattern = /[0-9a-f]{40}/
 
       # Don't look for mentions in text nodes that are children of these elements
-      IGNORE_PARENTS = %w(pre code a style).to_set
+      IGNORE_PARENTS = %w(pre code a style script).to_set
 
       def call
         result[:mentioned_commitids] ||= []
 
         doc.search('text()').each do |node|
           content = node.to_html
-          next if !content.match(CommitidPattern)
+          next if !content.match(commitid_pattern)
           next if has_ancestor?(node, IGNORE_PARENTS)
           html = mention_link_filter(content, base_url, commitid_pattern)
           next if html == content
@@ -94,11 +94,10 @@ module HTML
 
         url = base_url.dup
         url << "/" unless url =~ /[\/~]\z/
+        url << commitid
         shortid = commitid[-7..-1] || commitid
 
-        "<a href='#{url << commitid}' class='commit-mention'>" +
-        "#{shortid}" +
-        "</a>"
+        "<a href='#{url}' class='commit-mention'>#{shortid}</a>"
       end
     end
   end
