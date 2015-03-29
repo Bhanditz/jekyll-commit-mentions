@@ -16,18 +16,12 @@ class TestJekyllCommitMentions < Minitest::Test
     @site.read
     @site.config['jekyll-commit-mentions'] = {"base_url" => "https://github.com/usr1/repo1/commit"}
     @mentions = Jekyll::CommitMentions.new(@site.config)
-    @mention = "1234 <a href='https://github.com/usr1/repo1/commit/#{commitid}' class='commit-mention'>#{short_commitid}</a> 1234"
+    @mention = "1234 <a href=\"https://github.com/usr1/repo1/commit/#{commitid}\" class=\"commit-mention\">#{short_commitid}</a> 1234"
   end
 
   def content page
     # counter UTF-8 encoding https://groups.google.com/forum/#!msg/nokogiri-talk/Q2Nh1cLeQzk/dNyAwQ3vgQsJ
-    page.content.
-      gsub(/\n\z/, '').
-      gsub('"', "'").
-      gsub("&gt;", ">").
-      gsub("%7B", "{").
-      gsub("%20", " ").
-      gsub("%7D", "}")
+    page.content.gsub(/\n\z/, '')
   end
 
   def base_url(configs)
@@ -57,7 +51,7 @@ class TestJekyllCommitMentions < Minitest::Test
     page = page_with_name(@site, "leave-liquid-alone.md")
 
     @mentions.mentionify page
-    assert_equal "#{@mention}<a href='{{ foo }}'>1234</a>", content(page)
+    assert_equal "#{@mention}<a href=\"{{ foo }}\">1234</a>", content(page)
   end
 
   should "not mangle markdown" do
@@ -83,7 +77,7 @@ class TestJekyllCommitMentions < Minitest::Test
     page = page_with_name(@site, "parkr.txt")
 
     @mentions.mentionify page
-    assert_equal "Parker <a href='https://github.com/usr1/repo1/commit/#{commitid}' class='commit-mention'>#{short_commitid}</a> Moore", content(page)
+    assert_equal "Parker <a href=\"https://github.com/usr1/repo1/commit/#{commitid}\" class=\"commit-mention\">#{short_commitid}</a> Moore", content(page)
   end
 
 

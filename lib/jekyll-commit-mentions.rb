@@ -19,7 +19,12 @@ module Jekyll
 
     def mentionify(page)
       @filter = HTML::Pipeline::CommitMentionFilter.new(page.content, {:base_url => base_url})
-      page.content = @filter.call.to_s
+      page.content = @filter.call.to_s.
+        gsub("&gt;", ">").
+        gsub("&lt;", "<").
+        gsub("%7B", "{").
+        gsub("%20", " ").
+        gsub("%7D", "}")
     end
 
     def html_page?(page)
